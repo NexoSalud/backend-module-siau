@@ -60,9 +60,8 @@ public class DepartamentoController {
 
     @PatchMapping("/{id}/toggle")
     public Mono<ResponseEntity<Void>> toggleActivo(@PathVariable("id") Long id) {
-        return Mono.fromCallable(() -> {
-            boolean ok = service.toggleActivo(id);
-            return ok ? ResponseEntity.noContent().build() : ResponseEntity.notFound().<Void>build();
-        }).subscribeOn(Schedulers.boundedElastic());
+        return Mono.fromCallable(() -> service.toggleActivo(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(ok -> ok ? ResponseEntity.<Void>noContent().build() : ResponseEntity.<Void>notFound().build());
     }
 }
