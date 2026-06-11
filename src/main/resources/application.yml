@@ -2,7 +2,7 @@ spring:
   application:
     name: siau-service
   r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/nexosalud}
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://postgres:5432/nexosalud}
     username: ${SPRING_R2DBC_USERNAME:postgres}
     password: ${SPRING_R2DBC_PASSWORD:postgres}
   sql:
@@ -26,20 +26,20 @@ logging:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
   sql:
     init:
       mode: always
       schema-locations: classpath:schema.sql
   r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://postgres:5432/nexosalud}
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/nexosalud}
     username: ${SPRING_R2DBC_USERNAME:postgres}
-    password: ${SPRING_R2DBC_PASSWORD}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
 server:
   port: ${SIAU_PORT:8088}
 logging:
   level:
-    com.reactive.nexo.siau: INFO
+    com.reactive.nexo.siau: DEBUG
 
 ---
 spring:
