@@ -2,6 +2,7 @@ package com.reactive.nexo.siau.service;
 
 import com.reactive.nexo.siau.dto.AsignacionResponse;
 import com.reactive.nexo.siau.dto.CreateAsignacionRequest;
+import com.reactive.nexo.siau.dto.DashboardStatsResponse;
 import com.reactive.nexo.siau.entity.AsignacionEntity;
 import com.reactive.nexo.siau.entity.DepartamentoEntity;
 import com.reactive.nexo.siau.entity.PqrsdfEntity;
