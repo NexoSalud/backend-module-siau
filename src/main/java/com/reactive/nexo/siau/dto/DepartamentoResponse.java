@@ -16,6 +16,7 @@ public class DepartamentoResponse {
     private String nombre;
     private String descripcion;
     private String responsable;
+    private Long responsableId;
     private Boolean activo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

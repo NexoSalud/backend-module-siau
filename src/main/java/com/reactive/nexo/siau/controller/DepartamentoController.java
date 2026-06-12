@@ -64,4 +64,11 @@ public class DepartamentoController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .map(ok -> ok ? ResponseEntity.<Void>noContent().build() : ResponseEntity.<Void>notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> delete(@PathVariable("id") Long id) {
+        return Mono.fromCallable(() -> service.delete(id))
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(ok -> ok ? ResponseEntity.<Void>noContent().build() : ResponseEntity.<Void>notFound().build());
+    }
 }

@@ -24,6 +24,9 @@ public interface AsignacionRepository extends ReactiveCrudRepository<AsignacionE
     @Query("SELECT COUNT(*) FROM siau_asignaciones WHERE departamento_id = :deptoId AND estado = :estado")
     Mono<Long> countByDepartamentoAndEstado(Long deptoId, String estado);
 
+    @Query("SELECT COUNT(*) FROM siau_asignaciones WHERE departamento_id = :deptoId")
+    Mono<Long> countByDepartamento(Long deptoId);
+
     @Query("SELECT * FROM siau_asignaciones WHERE pqrsdf_id = :pqrsdfId ORDER BY created_at DESC LIMIT 1")
     Mono<AsignacionEntity> findUltimaByPqrsdfId(Long pqrsdfId);
 }

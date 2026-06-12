@@ -29,9 +29,11 @@ CREATE TABLE IF NOT EXISTS siau_departamentos (
     nombre VARCHAR(200) NOT NULL,
     descripcion TEXT,
     responsable VARCHAR(200),
+    responsable_id BIGINT,
     activo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_siau_departamento_nombre UNIQUE (nombre)
 );
 
 -- Registro principal de PQRSDF
@@ -147,4 +149,4 @@ INSERT INTO siau_departamentos (nombre, descripcion, responsable, activo) VALUES
     ('Administración', 'Dirección y administración general', NULL, TRUE),
     ('Odontología', 'Servicio odontológico', NULL, TRUE),
     ('Subgerencia Científica', 'Subgerencia científica y calidad', NULL, TRUE)
-ON CONFLICT DO NOTHING;
+ON CONFLICT (nombre) DO NOTHING;
