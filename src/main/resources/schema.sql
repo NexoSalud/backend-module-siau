@@ -37,14 +37,6 @@ CREATE TABLE IF NOT EXISTS siau_departamentos (
 -- Migraciones seguras para tablas existentes
 ALTER TABLE siau_departamentos ADD COLUMN IF NOT EXISTS responsable_id BIGINT;
 
-DO $$ BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'uq_siau_departamento_nombre'
-    ) THEN
-        ALTER TABLE siau_departamentos ADD CONSTRAINT uq_siau_departamento_nombre UNIQUE (nombre);
-    END IF;
-END $$;
-
 -- Registro principal de PQRSDF
 CREATE TABLE IF NOT EXISTS siau_pqrsdf (
     id BIGSERIAL PRIMARY KEY,
