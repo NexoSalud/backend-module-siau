@@ -29,12 +29,21 @@ CREATE TABLE IF NOT EXISTS siau_departamentos (
     nombre VARCHAR(200) NOT NULL,
     descripcion TEXT,
     responsable VARCHAR(200),
-    responsable_id BIGINT,
     activo BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_siau_departamento_nombre UNIQUE (nombre)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Migraciones seguras para tablas existentes
+ALTER TABLE siau_departamentos ADD COLUMN IF NOT EXISTS responsable_id BIGINT;
+
+DO $$ BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'uq_siau_departamento_nombre'
+    ) THEN
+        ALTER TABLE siau_departamentos ADD CONSTRAINT uq_siau_departamento_nombre UNIQUE (nombre);
+    END IF;
+END $$;
 
 -- Registro principal de PQRSDF
 CREATE TABLE IF NOT EXISTS siau_pqrsdf (
@@ -149,4 +158,4 @@ INSERT INTO siau_departamentos (nombre, descripcion, responsable, activo) VALUES
     ('Administración', 'Dirección y administración general', NULL, TRUE),
     ('Odontología', 'Servicio odontológico', NULL, TRUE),
     ('Subgerencia Científica', 'Subgerencia científica y calidad', NULL, TRUE)
-ON CONFLICT (nombre) DO NOTHING;
+ON CONFLICT DO NOTHING;
