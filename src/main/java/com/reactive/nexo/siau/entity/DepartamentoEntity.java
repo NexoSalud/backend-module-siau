@@ -22,6 +22,10 @@ public class DepartamentoEntity {
     private String nombre;
     private String descripcion;
     private String responsable;
+
+    @Column("responsable_id")
+    private Long responsableId;
+
     private Boolean activo;
 
     @Column("created_at")

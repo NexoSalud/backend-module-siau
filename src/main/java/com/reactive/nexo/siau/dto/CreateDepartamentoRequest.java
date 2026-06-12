@@ -19,4 +19,6 @@ public class CreateDepartamentoRequest {
     private String descripcion;
 
     private String responsable;
+
+    private Long responsableId;
 }

@@ -31,6 +31,7 @@ public class DepartamentoService {
                 .nombre(req.getNombre())
                 .descripcion(req.getDescripcion())
                 .responsable(req.getResponsable())
+                .responsableId(req.getResponsableId())
                 .activo(true)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -98,6 +99,7 @@ public class DepartamentoService {
         if (req.getNombre() != null) entity.setNombre(req.getNombre());
         if (req.getDescripcion() != null) entity.setDescripcion(req.getDescripcion());
         if (req.getResponsable() != null) entity.setResponsable(req.getResponsable());
+        if (req.getResponsableId() != null) entity.setResponsableId(req.getResponsableId());
         entity.setUpdatedAt(LocalDateTime.now());
 
         DepartamentoEntity saved = repo.save(entity)
@@ -123,12 +125,36 @@ public class DepartamentoService {
         return true;
     }
 
+    public boolean delete(Long id) {
+        DepartamentoEntity entity = repo.findById(id)
+                .subscribeOn(Schedulers.boundedElastic())
+                .block();
+        if (entity == null) return false;
+
+        // Primero verificar si tiene asignaciones
+        Long asignaciones = asignacionRepo.countByDepartamento(id)
+                .subscribeOn(Schedulers.boundedElastic())
+                .blockOptional().orElse(0L);
+
+        if (asignaciones > 0) {
+            log.warn("No se puede eliminar departamento {} porque tiene {} asignaciones activas", id, asignaciones);
+            return false;
+        }
+
+        repo.deleteById(id)
+                .subscribeOn(Schedulers.boundedElastic())
+                .block();
+        log.info("Departamento eliminado: ID {}", id);
+        return true;
+    }
+
     private DepartamentoResponse mapToResponse(DepartamentoEntity e, Long pendientes) {
         return DepartamentoResponse.builder()
                 .id(e.getId())
                 .nombre(e.getNombre())
                 .descripcion(e.getDescripcion())
                 .responsable(e.getResponsable())
+                .responsableId(e.getResponsableId())
                 .activo(e.getActivo())
                 .createdAt(e.getCreatedAt())
                 .updatedAt(e.getUpdatedAt())
