@@ -15,4 +15,6 @@ WORKDIR /app
 RUN apk add --no-cache wget curl
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8088
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD curl -f http://localhost:${SERVER_PORT:-8088}/actuator/health || exit 1
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
