@@ -1,20 +1,11 @@
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
+FROM python:3.12-slim
 WORKDIR /app
-
-# Cache de dependencias Maven
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-# Compilación
-ARG DEPLOY_VERSION=1
-COPY src ./src
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
-RUN apk add --no-cache wget curl
-COPY --from=build /app/target/*.jar app.jar
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates libpango-1.0-0 libcairo2 libgdk-pixbuf2.0-0 libffi-dev \
+    libpangocairo-1.0-0 shared-mime-info \
+    && rm -rf /var/lib/apt/lists/*
+COPY pyproject.toml .
+RUN pip install --no-cache-dir .
+COPY . .
 EXPOSE 8088
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -f http://localhost:${SERVER_PORT:-8088}/actuator/health || exit 1
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8088"]

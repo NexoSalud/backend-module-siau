@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Resumen PQRSDF - {{ pqrsdf.consecutivo }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm 2cm 2cm 2cm;
+            @top-center {
+                content: "NexoSalud S.A.S. — Sistema SIAU";
+                font-size: 8pt;
+                color: #666;
+            }
+            @bottom-center {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 8pt;
+                color: #666;
+            }
+        }
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #222;
+        }
+        h1 {
+            font-size: 18pt;
+            color: #004080;
+            border-bottom: 3px solid #004080;
+            padding-bottom: 6px;
+            margin-top: 0;
+        }
+        h2 {
+            font-size: 13pt;
+            color: #004080;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+            margin-top: 24px;
+        }
+        h3 {
+            font-size: 11pt;
+            color: #333;
+            margin: 16px 0 4px;
+        }
+        .header-bar {
+            background: #004080;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        .header-bar strong {
+            font-size: 14pt;
+        }
+        .header-bar .sub {
+            font-size: 9pt;
+            opacity: 0.85;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0 16px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #004080;
+            color: white;
+            font-weight: 600;
+            font-size: 9pt;
+        }
+        .info-table td:first-child {
+            width: 30%;
+            font-weight: 600;
+            background: #f5f5f5;
+        }
+        .estado-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: 700;
+        }
+        .estado-RECIBIDO   { background: #e3f2fd; color: #1565c0; }
+        .estado-ASIGNADO   { background: #fff3e0; color: #e65100; }
+        .estado-RESPONDIDO { background: #e8f5e9; color: #2e7d32; }
+        .estado-CERRADO    { background: #f3e5f5; color: #6a1b9a; }
+        .estado-PENDIENTE  { background: #fff8e1; color: #f57f17; }
+        .trazabilidad-table tr td:first-child {
+            white-space: nowrap;
+            font-size: 9pt;
+            color: #666;
+        }
+        .footer-note {
+            margin-top: 30px;
+            font-size: 8pt;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .badge-ok     { color: #2e7d32; }
+        .badge-warn   { color: #e65100; }
+        .badge-danger { color: #c62828; }
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado -->
+    <div class="header-bar">
+        <strong>{{ pqrsdf.consecutivo }}</strong><br/>
+        <span class="sub">{{ pqrsdf.tipoNombre }} · {{ pqrsdf.fechaRadicado }}</span>
+    </div>
+
+    <!-- Información general -->
+    <h2>Información General</h2>
+    <table class="info-table">
+        <tr><td>Consecutivo</td><td>{{ pqrsdf.consecutivo }}</td></tr>
+        <tr><td>Tipo</td><td>{{ pqrsdf.tipo }} - {{ pqrsdf.tipoNombre }}</td></tr>
+        <tr><td>Estado</td>
+            <td><span class="estado-badge estado-{{ pqrsdf.estado }}">{{ pqrsdf.estado }}</span></td>
+        </tr>
+        <tr><td>Fecha de Radicado</td><td>{{ pqrsdf.fechaRadicado }}</td></tr>
+        <tr><td>Hora de Radicado</td><td>{{ pqrsdf.horaRadicado or '—' }}</td></tr>
+        <tr><td>Medio de Recepción</td><td>{{ pqrsdf.medioRecepcion }}</td></tr>
+        <tr><td>Clasificación</td><td>{{ pqrsdf.clasificacion or '—' }}</td></tr>
+        <tr><td>Servicio Involucrado</td><td>{{ pqrsdf.servicioInvolucrado or '—' }}</td></tr>
+        <tr><td>Funcionario Involucrado</td><td>{{ pqrsdf.funcionarioInvolucrado or '—' }}</td></tr>
+    </table>
+
+    <!-- Datos del usuario -->
+    <h2>Datos del Usuario</h2>
+    <table class="info-table">
+        <tr><td>Nombres</td><td>{{ pqrsdf.nombresUsuario }}</td></tr>
+        <tr><td>Tipo Documento</td><td>{{ pqrsdf.tipoDocumento or '—' }}</td></tr>
+        <tr><td>Número Documento</td><td>{{ pqrsdf.numeroDocumento or '—' }}</td></tr>
+        <tr><td>Teléfono</td><td>{{ pqrsdf.telefono or '—' }}</td></tr>
+        <tr><td>Email</td><td>{{ pqrsdf.email or '—' }}</td></tr>
+        <tr><td>Dirección</td><td>{{ pqrsdf.direccion or '—' }}</td></tr>
+        <tr><td>EPS</td><td>{{ pqrsdf.eps or '—' }}</td></tr>
+        <tr><td>Régimen</td><td>{{ pqrsdf.regimen or '—' }}</td></tr>
+    </table>
+
+    <!-- Descripción -->
+    <h2>Descripción</h2>
+    <p style="background:#f9f9f9; padding:10px; border-radius:4px; white-space:pre-wrap;">{{ pqrsdf.descripcion }}</p>
+
+    <!-- Respuesta -->
+    {% if pqrsdf.respuestaFinal %}
+    <h2>Respuesta</h2>
+    <p style="background:#f0f8f0; padding:10px; border-radius:4px; white-space:pre-wrap;">{{ pqrsdf.respuestaFinal }}</p>
+    <table class="info-table">
+        <tr><td>Fecha Respuesta</td><td>{{ pqrsdf.fechaRespuesta or '—' }}</td></tr>
+        <tr><td>Medio Respuesta</td><td>{{ pqrsdf.medioRespuesta or '—' }}</td></tr>
+    </table>
+    {% endif %}
+
+    <!-- Trazabilidad -->
+    {% if incluir_trazabilidad and trazabilidad %}
+    <h2>Trazabilidad</h2>
+    <table class="trazabilidad-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Acción</th>
+                <th>Descripción</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in trazabilidad %}
+            <tr>
+                <td>{{ t.createdAt.strftime('%Y-%m-%d %H:%M') if t.createdAt else '—' }}</td>
+                <td><strong>{{ t.accion }}</strong></td>
+                <td>{{ t.descripcion or '—' }}</td>
+                <td>{{ t.usuarioNombre or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Asignaciones -->
+    {% if incluir_asignaciones and asignaciones %}
+    <h2>Asignaciones</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Departamento</th>
+                <th>Estado</th>
+                <th>Fecha Asignación</th>
+                <th>Fecha Límite</th>
+                <th>Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in asignaciones %}
+            <tr>
+                <td>{{ a.departamentoNombre or a.departamentoId }}</td>
+                <td><span class="estado-badge estado-{{ a.estado }}">{{ a.estado }}</span></td>
+                <td>{{ a.fechaAsignacion.strftime('%Y-%m-%d') if a.fechaAsignacion else '—' }}</td>
+                <td>{{ a.fechaLimiteRespuesta if a.fechaLimiteRespuesta else '—' }}</td>
+                <td>{{ a.respuestaArea or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Nota de firmas / footer -->
+    <div class="footer-note">
+        Documento generado por NexoSalud SIAU el {{ generation_date }}<br/>
+        Este es un documento digital generado automáticamente.
+    </div>
+
+</body>
+</html>

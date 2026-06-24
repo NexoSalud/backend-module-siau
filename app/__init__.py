@@ -1,0 +1,1 @@
+"""NexoSalud SIAU Backend API."""
