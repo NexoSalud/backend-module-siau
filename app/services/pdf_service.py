@@ -42,6 +42,11 @@ _FILTERS_TO_REGISTER: dict[str, Any] = {}
 # Public API
 # ──────────────────────────────────────────────
 
+def count_with_parse(counts: dict[str, int], key: str) -> int:
+    """Helper: retorna 0 si no existe la clave."""
+    return counts.get(key, 0)
+
+
 async def generate_acta_buzon_pdf(
     session: AsyncSession,
     acta: ActaBuzon,
@@ -66,37 +71,18 @@ async def generate_acta_buzon_pdf(
     ubicacion = acta.ubicacion or "_____________________"
     servicio = acta.servicio or "________________________________"
 
-    # Map tipo codes to form labels
-    tipo_labels = {
-        "P": "Peticiones",
-        "Q": "Quejas",
-        "R": "Reclamo de riesgo simple",
-        "D": "Reclamo de riesgo priorizado",
-        "V": "Reclamo de riesgo vital",
-        "S": "Sugerencias",
-        "F": "Felicitaciones",
-    }
-    tipo_descs = {
-        "P": "Solicitud de información, documentos o intervención",
-        "Q": "Inconformidad con el actuar de un funcionario",
-        "R": "Insatisfacción sin riesgo inminente (72h respuesta)",
-        "D": "Riesgo para integridad o población vulnerable (48h)",
-        "V": "Riesgo inminente para la vida (24h respuesta)",
-        "S": "Recomendación para mejorar el servicio",
-        "F": "Manifestación positiva del usuario",
-    }
+    # Reclamo sub-types:
+    # R (Reclamo) → riesgo simple
+    # D (Denuncia) → riesgo priorizado
+    # No direct mapping for riesgo vital, use 0 or custom
+    reclamo_simple = count_with_parse(counts, "R")
+    reclamo_priorizado = count_with_parse(counts, "D")
+    reclamo_vital = count_with_parse(counts, "V")
 
-    rows = []
-    for tipo_code in ["P", "Q", "R", "V", "D", "S", "F"]:
-        total = counts.get(tipo_code, 0)
-        if total > 0 or tipo_code in ("P", "Q", "R", "S"):  # Show common types always
-            rows.append({
-                "tipo": tipo_labels.get(tipo_code, tipo_code),
-                "total": total,
-                "descripcion": tipo_descs.get(tipo_code, ""),
-            })
+    total = acta.total_pqrsdf or sum(
+        counts.get(k, 0) for k in ("P", "Q", "R", "S", "F", "D", "V")
+    )
 
-    # Render template
     template = _env.get_template("acta_apertura_buzon.html")
     html_str = template.render(
         acta_id=acta.id,
@@ -105,8 +91,11 @@ async def generate_acta_buzon_pdf(
         anio=anio,
         ubicacion=ubicacion,
         servicio=servicio,
-        total_pqrsdf=acta.total_pqrsdf or sum(counts.values()),
-        rows=rows,
+        total_pqrsdf=total,
+        counts=counts,
+        reclamo_simple=reclamo_simple,
+        reclamo_priorizado=reclamo_priorizado,
+        reclamo_vital=reclamo_vital,
     )
 
     pdf_bytes = HTML(string=html_str).write_pdf()
