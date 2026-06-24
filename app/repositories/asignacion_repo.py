@@ -2,11 +2,17 @@
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from sqlalchemy.orm import selectinload
+
 from app.models import Asignacion
+
+_ASIGNACION_LOAD = [selectinload(Asignacion.departamento_rel), selectinload(Asignacion.pqrsdf_rel)]
 
 
 async def find_by_id(session: AsyncSession, id: int) -> Asignacion | None:
-    result = await session.execute(select(Asignacion).where(Asignacion.id == id))
+    result = await session.execute(
+        select(Asignacion).where(Asignacion.id == id).options(*_ASIGNACION_LOAD)
+    )
     return result.scalar_one_or_none()
 
 
@@ -17,6 +23,7 @@ async def find_by_pqrsdf_id(
         select(Asignacion)
         .where(Asignacion.pqrsdf_id == pqrsdf_id)
         .order_by(Asignacion.created_at.desc())
+        .options(*_ASIGNACION_LOAD)
     )
     return list(result.scalars().all())
 
@@ -28,6 +35,7 @@ async def find_by_departamento_id(
         select(Asignacion)
         .where(Asignacion.departamento_id == depto_id)
         .order_by(Asignacion.created_at.desc())
+        .options(*_ASIGNACION_LOAD)
     )
     return list(result.scalars().all())
 
@@ -40,6 +48,7 @@ async def find_ultima_by_pqrsdf_id(
         .where(Asignacion.pqrsdf_id == pqrsdf_id)
         .order_by(Asignacion.created_at.desc())
         .limit(1)
+        .options(*_ASIGNACION_LOAD)
     )
     return result.scalar_one_or_none()
 

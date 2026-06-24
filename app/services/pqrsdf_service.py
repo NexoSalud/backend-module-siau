@@ -21,6 +21,9 @@ from app.schemas import (
 from app.models import Pqrsdf, Asignacion, Trazabilidad
 from app.services.catalogos import get_tipo_nombre
 
+# Static eager-load options to avoid MissingGreenlet in async mode
+_ULTIMA_ASIGNACION_LOAD = [selectinload(Asignacion.departamento_rel)]
+
 
 # ──────────────────────────────────────────────
 # Helpers
@@ -105,6 +108,7 @@ async def _get_ultima_asignacion_info(
         .where(Asignacion.pqrsdf_id == pqrsdf_id)
         .order_by(Asignacion.created_at.desc())
         .limit(1)
+        .options(*_ULTIMA_ASIGNACION_LOAD)
     )
     result = await session.execute(stmt)
     asignacion = result.scalar_one_or_none()
