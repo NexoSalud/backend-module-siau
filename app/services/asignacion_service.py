@@ -149,6 +149,7 @@ async def create(
             import asyncio
 
             tipo_nombre = get_tipo_nombre(pqrsdf.tipo) or pqrsdf.tipo
+            import os
             body = build_notification_body(
                 consecutivo=pqrsdf.consecutivo,
                 tipo_nombre=tipo_nombre,
@@ -156,6 +157,7 @@ async def create(
                 ubicacion=getattr(pqrsdf, "ubicacion", "") or "",
                 fecha_limite=fecha_limite.isoformat(),
                 pqrsdf_id=pqrsdf.id,
+                base_url=os.environ.get("FRONTEND_URL", "http://gruponexosalud.com"),
             )
             subject = f"PQRSDF {pqrsdf.consecutivo} asignada a {depto.nombre}"
 

@@ -12,6 +12,7 @@ from app.routers import (
     catalogos,
     departamentos,
     email_inbound,
+    external,
     pdf,
     pqrsdf,
 )
@@ -65,6 +66,7 @@ app = FastAPI(
 app.include_router(pqrsdf.router)
 app.include_router(departamentos.router)
 app.include_router(asignaciones.router)
+app.include_router(external.router)
 app.include_router(actas_buzon.router)
 app.include_router(catalogos.router)
 app.include_router(email_inbound.router)

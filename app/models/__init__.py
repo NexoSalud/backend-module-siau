@@ -126,3 +126,17 @@ class EmailNotification(Base):
     reply_received = Column(Boolean, default=False)
     reply_body = Column(Text)
     replied_at = Column(TIMESTAMP, nullable=True)
+
+
+class EmailAuthCode(Base):
+    """One-time 2FA code sent by email for external response authentication."""
+    __tablename__ = "siau_email_auth_codes"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    email = Column(String(200), nullable=False, index=True)
+    code = Column(String(10), nullable=False)
+    access_token = Column(String(64), nullable=True)
+    token_expires_at = Column(TIMESTAMP, nullable=True)
+    expires_at = Column(TIMESTAMP, nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(TIMESTAMP, default=datetime.now)
