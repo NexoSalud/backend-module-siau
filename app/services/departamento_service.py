@@ -67,6 +67,14 @@ async def create(
     return _map_to_response(saved)
 
 
+async def get_by_id(
+    session: AsyncSession,
+    id: int,
+) -> DepartamentoResponse | None:
+    """Alias router-compatible para find_by_id."""
+    return await find_by_id(session, id)
+
+
 async def find_by_id(
     session: AsyncSession,
     id: int,
@@ -79,6 +87,13 @@ async def find_by_id(
     return _map_to_response(entity, pendientes)
 
 
+async def list_all(
+    session: AsyncSession,
+) -> list[DepartamentoResponse]:
+    """Alias router-compatible para find_all."""
+    return await find_all(session)
+
+
 async def find_all(
     session: AsyncSession,
 ) -> list[DepartamentoResponse]:
@@ -89,6 +104,13 @@ async def find_all(
         pendientes = await _contar_pqrsdf_pendientes(session, e.id)
         responses.append(_map_to_response(e, pendientes))
     return responses
+
+
+async def list_activos(
+    session: AsyncSession,
+) -> list[DepartamentoResponse]:
+    """Alias router-compatible para find_activos."""
+    return await find_activos(session)
 
 
 async def find_activos(
@@ -127,6 +149,14 @@ async def update(
 
     pendientes = await _contar_pqrsdf_pendientes(session, id)
     return _map_to_response(entity, pendientes)
+
+
+async def toggle(
+    session: AsyncSession,
+    id: int,
+) -> DepartamentoResponse | None:
+    """Alias router-compatible para toggle_activo."""
+    return await toggle_activo(session, id)
 
 
 async def toggle_activo(

@@ -143,6 +143,14 @@ async def create(
     )
 
 
+async def get_by_id(
+    session: AsyncSession,
+    id: int,
+) -> AsignacionResponse | None:
+    """Alias router-compatible para find_by_id."""
+    return await find_by_id(session, id)
+
+
 async def find_by_id(
     session: AsyncSession,
     id: int,
@@ -152,6 +160,14 @@ async def find_by_id(
     if entity is None:
         return None
     return _map_to_response(entity)
+
+
+async def list_by_pqrsdf(
+    session: AsyncSession,
+    pqrsdf_id: int,
+) -> list[AsignacionResponse]:
+    """Alias router-compatible para find_by_pqrsdf_id."""
+    return await find_by_pqrsdf_id(session, pqrsdf_id)
 
 
 async def find_by_pqrsdf_id(
@@ -170,6 +186,14 @@ async def find_by_pqrsdf_id(
     return responses
 
 
+async def list_by_departamento(
+    session: AsyncSession,
+    departamento_id: int,
+) -> list[AsignacionResponse]:
+    """Alias router-compatible para find_by_departamento_id."""
+    return await find_by_departamento_id(session, departamento_id)
+
+
 async def find_by_departamento_id(
     session: AsyncSession,
     departamento_id: int,
@@ -183,6 +207,16 @@ async def find_by_departamento_id(
         depto_nombre = _get_departamento_nombre(e)
         responses.append(_map_to_response(e, consecutivo=consecutivo, depto_nombre=depto_nombre))
     return responses
+
+
+async def responder(
+    session: AsyncSession,
+    id: int,
+    body: dict,
+    employee_id: int,
+) -> AsignacionResponse | None:
+    """Alias router-compatible para responder_asignacion (body es dict con campo 'respuesta')."""
+    return await responder_asignacion(session, id, body.get("respuesta", ""), employee_id)
 
 
 async def responder_asignacion(

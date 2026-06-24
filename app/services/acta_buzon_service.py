@@ -46,6 +46,13 @@ async def create(
     return _map_to_response(saved)
 
 
+async def list_all(
+    session: AsyncSession,
+) -> list[ActaBuzonResponse]:
+    """Alias router-compatible para find_all."""
+    return await find_all(session)
+
+
 async def find_all(
     session: AsyncSession,
 ) -> list[ActaBuzonResponse]:
@@ -56,6 +63,14 @@ async def find_all(
         entities, key=lambda x: x.created_at or datetime.min, reverse=True
     )
     return [_map_to_response(e) for e in sorted_entities]
+
+
+async def get_by_id(
+    session: AsyncSession,
+    id: int,
+) -> ActaBuzonResponse | None:
+    """Alias router-compatible para find_by_id."""
+    return await find_by_id(session, id)
 
 
 async def find_by_id(

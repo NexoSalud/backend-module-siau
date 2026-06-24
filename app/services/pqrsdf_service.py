@@ -14,6 +14,7 @@ from app.schemas import (
     CreatePqrsdfRequest,
     UpdatePqrsdfRequest,
     ResponderPqrsdfRequest,
+    PagedResponse,
     PqrsdfResponse,
     TrazabilidadResponse,
 )
@@ -185,6 +186,14 @@ async def create(
     return _map_to_response(saved, ultimo_depto=None, ultimo_estado_asig=None, dias=0)
 
 
+async def get_by_id(
+    session: AsyncSession,
+    id: int,
+) -> PqrsdfResponse | None:
+    """Alias router-compatible para find_by_id."""
+    return await find_by_id(session, id)
+
+
 async def find_by_id(
     session: AsyncSession,
     id: int,
@@ -196,6 +205,40 @@ async def find_by_id(
 
     depto, estado_asig, dias = await _get_ultima_asignacion_info(session, id)
     return _map_to_response(entity, depto, estado_asig, dias)
+
+
+async def list_all(
+    session: AsyncSession,
+    page: int = 0,
+    size: int = 10,
+    estado: str | None = None,
+    tipo: str | None = None,
+    numero_documento: str | None = None,
+    fecha_desde: str | None = None,
+    fecha_hasta: str | None = None,
+) -> PagedResponse:
+    """Lista PQRSDF con filtros opcionales y paginación (wrapper router-compatible)."""
+    filters = {}
+    if estado:
+        filters["estado"] = estado
+    if tipo:
+        filters["tipo"] = tipo
+    if numero_documento:
+        filters["numeroDocumento"] = numero_documento
+    if fecha_desde:
+        filters["fechaDesde"] = fecha_desde
+    if fecha_hasta:
+        filters["fechaHasta"] = fecha_hasta
+    items = await search(session, filters, page, size)
+    total = await count(session, filters)
+    return PagedResponse(
+        content=items,
+        page=page,
+        size=size,
+        totalElements=total,
+        totalPages=max(1, (total + size - 1) // size),
+        last=(page + 1) * size >= total,
+    )
 
 
 async def search(

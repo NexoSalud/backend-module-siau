@@ -31,6 +31,16 @@ _FILTERS_TO_REGISTER: dict[str, Any] = {}
 # Public API
 # ──────────────────────────────────────────────
 
+async def generate_summary(
+    session: AsyncSession,
+    pqrsdf_id: int,
+    incluir_trazabilidad: bool = True,
+    incluir_asignaciones: bool = True,
+) -> bytes:
+    """Alias router-compatible para generar_pdf_resumen."""
+    return await generar_pdf_resumen(session, pqrsdf_id, incluir_trazabilidad, incluir_asignaciones)
+
+
 async def generar_pdf_resumen(
     session: AsyncSession,
     pqrsdf_id: int,
