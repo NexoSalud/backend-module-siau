@@ -112,3 +112,17 @@ class ActaBuzon(Base):
     observaciones = Column(Text)
     created_at = Column(TIMESTAMP, default=datetime.now)
     created_by = Column(BigInteger)
+
+
+class EmailNotification(Base):
+    __tablename__ = "siau_email_notifications"
+
+    id = Column(String(36), primary_key=True)  # UUID
+    pqrsdf_id = Column(BigInteger, ForeignKey("siau_pqrsdf.id"), nullable=False)
+    departamento_id = Column(BigInteger, ForeignKey("siau_departamentos.id"))
+    to_email = Column(String(200), nullable=False)
+    subject = Column(String(300))
+    sent_at = Column(TIMESTAMP, default=datetime.now)
+    reply_received = Column(Boolean, default=False)
+    reply_body = Column(Text)
+    replied_at = Column(TIMESTAMP, nullable=True)

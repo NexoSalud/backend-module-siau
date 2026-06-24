@@ -95,7 +95,11 @@ def build_notification_body(
     pqrsdf_id: int,
     base_url: str = "",
 ) -> str:
-    """Build plain-text notification body for an assignment."""
+    """Build plain-text notification body for an assignment.
+
+    Includes instructions for the recipient to reply (the reply-to header
+    will route their response back to the SIAU webhook).
+    """
     lines = [
         f"Se le ha asignado una PQRSDF para atención:",
         "",
@@ -107,6 +111,9 @@ def build_notification_body(
         "",
         "Por favor ingrese al sistema para gestionar esta solicitud.",
         "",
+        "Puede responder directamente a este correo y su mensaje será",
+        "registrado automáticamente en la trazabilidad de la PQRSDF.",
+        "",
     ]
     if base_url:
         lines.append(f"Enlace directo: {base_url}/dashboard/siau/{pqrsdf_id}")
@@ -116,6 +123,6 @@ def build_notification_body(
         "Sistema SIAU — NexoSalud",
         "",
         "---",
-        "Este es un mensaje automático. Por favor no responda directamente a este correo.",
+        "Este es un mensaje automático.",
     ])
     return "\n".join(lines)

@@ -9,13 +9,13 @@ from sqlalchemy import select, func
 
 import logging
 
-from app.repositories import asignacion_repo, pqrsdf_repo, departamento_repo, trazabilidad_repo
+from app.repositories import asignacion_repo, pqrsdf_repo, departamento_repo, trazabilidad_repo, email_notification_repo
 from app.schemas import (
     CreateAsignacionRequest,
     AsignacionResponse,
     DashboardStatsResponse,
 )
-from app.models import Asignacion, Pqrsdf, Trazabilidad
+from app.models import Asignacion, Pqrsdf, Trazabilidad, EmailNotification
 from app.services.email_service import send_email, build_notification_body
 from app.services.catalogos import get_tipo_nombre
 
@@ -145,6 +145,9 @@ async def create(
     # ── Notificación por email ──────────────────────────────
     if depto.email:
         try:
+            import uuid
+            import asyncio
+
             tipo_nombre = get_tipo_nombre(pqrsdf.tipo) or pqrsdf.tipo
             body = build_notification_body(
                 consecutivo=pqrsdf.consecutivo,
@@ -155,10 +158,23 @@ async def create(
                 pqrsdf_id=pqrsdf.id,
             )
             subject = f"PQRSDF {pqrsdf.consecutivo} asignada a {depto.nombre}"
-            # Send async via thread executor (sync smtplib in thread)
-            import asyncio
+
+            # Create notification record for reply tracking
+            notif_id = str(uuid.uuid4())
+            notif = EmailNotification(
+                id=notif_id,
+                pqrsdf_id=pqrsdf.id,
+                departamento_id=depto.id,
+                to_email=depto.email,
+                subject=subject,
+            )
+            await email_notification_repo.save(session, notif)
+
+            # Send async via thread executor
             loop = asyncio.get_event_loop()
-            loop.run_in_executor(None, send_email, depto.email, subject, body, None)
+            loop.run_in_executor(
+                None, send_email, depto.email, subject, body, notif_id
+            )
         except Exception as e:
             logger.warning("Failed to send email notification: %s", e)
 

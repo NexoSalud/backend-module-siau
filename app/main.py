@@ -8,6 +8,7 @@ from app.routers import (
     asignaciones,
     catalogos,
     departamentos,
+    email_inbound,
     pdf,
     pqrsdf,
 )
@@ -34,6 +35,7 @@ app.include_router(departamentos.router)
 app.include_router(asignaciones.router)
 app.include_router(actas_buzon.router)
 app.include_router(catalogos.router)
+app.include_router(email_inbound.router)
 app.include_router(pdf.router)
 
 
