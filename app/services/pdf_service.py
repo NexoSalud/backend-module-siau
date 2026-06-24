@@ -11,7 +11,18 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from weasyprint import HTML
 
 from app.repositories import pqrsdf_repo, trazabilidad_repo, asignacion_repo
+from app.models import ActaBuzon
 from app.services.catalogos import get_tipo_nombre
+
+# ── Tipo names for report ──────────────────────────────────
+_TIPO_DESCRIPCION = {
+    "P": "Petición",
+    "Q": "Queja",
+    "R": "Reclamo de riesgo simple",
+    "S": "Sugerencia",
+    "D": "Reclamo de riesgo priorizado",
+    "F": "Felicitación",
+}
 
 # ──────────────────────────────────────────────
 # Jinja2 environment
@@ -30,6 +41,77 @@ _FILTERS_TO_REGISTER: dict[str, Any] = {}
 # ──────────────────────────────────────────────
 # Public API
 # ──────────────────────────────────────────────
+
+async def generate_acta_buzon_pdf(
+    session: AsyncSession,
+    acta: ActaBuzon,
+    counts: dict[str, int],
+) -> bytes:
+    """Genera el PDF del Acta de Apertura de Buzón según formato PM-S-FR04."""
+    from datetime import date
+
+    # Parse date parts
+    fa = acta.fecha_apertura
+    if isinstance(fa, date):
+        dia = str(fa.day)
+        meses = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+        ]
+        mes = meses[fa.month - 1]
+        anio = str(fa.year)
+    else:
+        dia = "___"; mes = "_______________"; anio = "______"
+
+    ubicacion = acta.ubicacion or "_____________________"
+    servicio = acta.servicio or "________________________________"
+
+    # Map tipo codes to form labels
+    tipo_labels = {
+        "P": "Peticiones",
+        "Q": "Quejas",
+        "R": "Reclamo de riesgo simple",
+        "D": "Reclamo de riesgo priorizado",
+        "V": "Reclamo de riesgo vital",
+        "S": "Sugerencias",
+        "F": "Felicitaciones",
+    }
+    tipo_descs = {
+        "P": "Solicitud de información, documentos o intervención",
+        "Q": "Inconformidad con el actuar de un funcionario",
+        "R": "Insatisfacción sin riesgo inminente (72h respuesta)",
+        "D": "Riesgo para integridad o población vulnerable (48h)",
+        "V": "Riesgo inminente para la vida (24h respuesta)",
+        "S": "Recomendación para mejorar el servicio",
+        "F": "Manifestación positiva del usuario",
+    }
+
+    rows = []
+    for tipo_code in ["P", "Q", "R", "V", "D", "S", "F"]:
+        total = counts.get(tipo_code, 0)
+        if total > 0 or tipo_code in ("P", "Q", "R", "S"):  # Show common types always
+            rows.append({
+                "tipo": tipo_labels.get(tipo_code, tipo_code),
+                "total": total,
+                "descripcion": tipo_descs.get(tipo_code, ""),
+            })
+
+    # Render template
+    template = _env.get_template("acta_apertura_buzon.html")
+    html_str = template.render(
+        acta_id=acta.id,
+        dia=dia,
+        mes=mes,
+        anio=anio,
+        ubicacion=ubicacion,
+        servicio=servicio,
+        total_pqrsdf=acta.total_pqrsdf or sum(counts.values()),
+        rows=rows,
+    )
+
+    pdf_bytes = HTML(string=html_str).write_pdf()
+    return pdf_bytes
+
 
 async def generate_summary(
     session: AsyncSession,

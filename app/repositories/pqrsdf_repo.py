@@ -41,6 +41,16 @@ async def count_by_tipo(session: AsyncSession, tipo: str) -> int:
     return result.scalar() or 0
 
 
+async def count_by_tipo_and_acta(session: AsyncSession, tipo: str, acta_buzon_id: int) -> int:
+    """Cuenta PQRSDF por tipo y acta de buzón."""
+    result = await session.execute(
+        select(func.count(Pqrsdf.id)).where(
+            and_(Pqrsdf.tipo == tipo, Pqrsdf.acta_buzon_id == acta_buzon_id)
+        )
+    )
+    return result.scalar() or 0
+
+
 async def find_max_id(session: AsyncSession) -> int:
     result = await session.execute(select(func.coalesce(func.max(Pqrsdf.id), 0)))
     return result.scalar() or 0

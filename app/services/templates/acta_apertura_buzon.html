@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: A4;
+    margin: 1.5cm 1.8cm;
+    @bottom-center {
+      content: "PM-S-FR04 — Versión 3 — Página " counter(page);
+      font-size: 8pt;
+      color: #666;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #222;
+  }
+
+  /* ── Header ──────────────────────────── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1a3c6e;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .header .code {
+    font-size: 8pt;
+    color: #555;
+  }
+  .header .code strong {
+    color: #1a3c6e;
+    font-size: 9pt;
+  }
+  .header .title {
+    text-align: right;
+  }
+  .header .title h1 {
+    font-size: 13pt;
+    color: #1a3c6e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .header .title .version {
+    font-size: 7.5pt;
+    color: #888;
+  }
+
+  /* ── Body ─────────────────────────────── */
+  h2 {
+    font-size: 11pt;
+    color: #1a3c6e;
+    margin: 18px 0 10px;
+    text-transform: uppercase;
+    border-left: 4px solid #1a3c6e;
+    padding-left: 8px;
+  }
+
+  .acta-intro {
+    background: #f5f8fc;
+    border: 1px solid #d0dce8;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 9.5pt;
+    line-height: 1.6;
+    text-align: justify;
+  }
+  .acta-intro .field {
+    display: inline-block;
+    min-width: 160px;
+    border-bottom: 1px solid #999;
+    padding: 0 4px;
+    font-weight: bold;
+  }
+
+  /* ── Table ────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 9.5pt;
+  }
+  table th {
+    background: #1a3c6e;
+    color: #fff;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 8.5pt;
+    letter-spacing: 0.5px;
+  }
+  table td {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+  }
+  table tr:nth-child(even) td {
+    background: #f9fafb;
+  }
+  table .total-row td {
+    font-weight: bold;
+    background: #e8f0fa;
+    border-top: 2px solid #1a3c6e;
+  }
+  table .num-col {
+    text-align: center;
+    width: 60px;
+  }
+  table .desc-col {
+    font-size: 8.5pt;
+    color: #555;
+    max-width: 340px;
+  }
+
+  /* ── Signature ────────────────────────── */
+  .signatures {
+    display: flex;
+    justify-content: space-between;
+    margin: 32px 0 20px;
+    gap: 30px;
+  }
+  .signatures .sig-block {
+    flex: 1;
+    text-align: center;
+    padding-top: 40px;
+  }
+  .signatures .sig-line {
+    border-top: 1px solid #333;
+    padding-top: 8px;
+    font-weight: bold;
+    font-size: 9pt;
+  }
+  .signatures .sig-label {
+    font-size: 8pt;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  /* ── Footer definitions ───────────────── */
+  .definitions {
+    border-top: 1px solid #ccc;
+    padding-top: 12px;
+    margin-top: 10px;
+    font-size: 7.5pt;
+    color: #555;
+    line-height: 1.5;
+    text-align: justify;
+  }
+  .definitions strong {
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="code">
+    <strong>Código:</strong> PM-S-FR04<br>
+    <strong>Versión:</strong> 3<br>
+    <strong>Fecha actualización:</strong> 27.11.2025
+  </div>
+  <div class="title">
+    <h1>Acta Apertura Buzón</h1>
+    <span class="version">PROCESO SIAU — ESE NORTE 3</span>
+  </div>
+</div>
+
+<div class="acta-intro">
+  El día <span class="field">{{ dia }}</span> del mes de
+  <span class="field">{{ mes }}</span> de <span class="field">{{ anio }}</span>,
+  se hace apertura del buzón de atención a solicitudes ciudadanas ubicado en el punto de
+  Atención de <span class="field">{{ ubicacion }}</span>,
+  en el servicio de <span class="field">{{ servicio }}</span>,
+  con la finalidad de dar trámite a todas aquellas PQRSF que los usuarios puedan haber
+  presentado como parte del programa de: <strong>SIAU</strong>.
+  Encontrándose un total de <strong>{{ total_pqrsdf }} PQRSF</strong>,
+  las cuales se clasifican así:
+</div>
+
+<h2>Acta de Apertura No. {{ acta_id }}</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:40%;">Tipo</th>
+      <th class="num-col">Total</th>
+      <th style="width:50%;">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td><strong>{{ row.tipo }}</strong></td>
+      <td class="num-col">{{ row.total }}</td>
+      <td class="desc-col">{{ row.descripcion }}</td>
+    </tr>
+    {% endfor %}
+    <tr class="total-row">
+      <td>TOTAL</td>
+      <td class="num-col">{{ total_pqrsdf }}</td>
+      <td class="desc-col">—</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="signatures">
+  <div class="sig-block">
+    <div class="sig-line">PROCESO SIAU</div>
+    <div class="sig-label">Firma responsable SIAU</div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-line">REPRESENTANTE ASOCIACIÓN DE USUARIOS</div>
+    <div class="sig-label">Firma representante</div>
+  </div>
+</div>
+
+<div class="definitions">
+  <p><strong>Petición:</strong> Solicitud a través de la cual una persona por motivos de interés general o particular solicita la intervención de la entidad para la resolución de una situación, la prestación de un servicio, la información o requerimiento de copia de documentos, entre otros.</p>
+  <p><strong>Queja:</strong> Manifestación de una persona, a través de la cual expresa inconformidad con el actuar de un funcionario de la entidad.</p>
+  <p><strong>Reclamo de riesgo vital:</strong> Reclamo que involucra un riesgo inminente para la vida o para la integridad de la persona. Tiempo de respuesta máximo 24 horas.</p>
+  <p><strong>Reclamo de riesgo priorizado:</strong> Reclamo que involucra algún riesgo para la integridad de las personas o que afecte a poblaciones vulnerables. Tiempo de respuesta máximo 48 horas.</p>
+  <p><strong>Reclamo de riesgo simple:</strong> Reclamo a través del cual los usuarios del Sector Salud dan a conocer su insatisfacción con la prestación del servicio de salud, sin riesgo inminente. Tiempo de respuesta máximo 72 horas.</p>
+  <p><strong>Sugerencia:</strong> Recomendación entregada por el usuario, que tiene por objeto mejorar el servicio que se presta.</p>
+  <p><strong>Felicitación:</strong> Manifestación positiva de un usuario acerca de los servicios que le brinda la IPS.</p>
+  <p><strong>Nota:</strong> Peticiones generales: 15 días hábiles. Solicitudes de información: 10 días hábiles. Copias: 3 días hábiles.</p>
+</div>
+
+</body>
+</html>

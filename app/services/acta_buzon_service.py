@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.repositories import acta_buzon_repo
+from app.repositories import acta_buzon_repo, pqrsdf_repo
 from app.schemas import ActaBuzonRequest, ActaBuzonResponse
 from app.models import ActaBuzon
 
@@ -71,6 +71,20 @@ async def get_by_id(
 ) -> ActaBuzonResponse | None:
     """Alias router-compatible para find_by_id."""
     return await find_by_id(session, id)
+
+
+async def get_pqrsdf_counts_by_tipo(
+    session: AsyncSession,
+    acta_buzon_id: int,
+) -> dict[str, int]:
+    """Obtiene conteo de PQRSDF agrupado por tipo para un acta."""
+    tipos = ["P", "Q", "R", "S", "D", "F"]
+    result = {}
+    for tipo in tipos:
+        count = await pqrsdf_repo.count_by_tipo_and_acta(session, tipo, acta_buzon_id)
+        if count > 0:
+            result[tipo] = count
+    return result
 
 
 async def find_by_id(
