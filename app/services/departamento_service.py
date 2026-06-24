@@ -38,6 +38,7 @@ def _map_to_response(
         descripcion=depto.descripcion,
         responsable=depto.responsable,
         responsableId=depto.responsable_id,
+        email=depto.email,
         activo=depto.activo if depto.activo is not None else True,
         createdAt=depto.created_at,
         updatedAt=depto.updated_at,
@@ -59,6 +60,7 @@ async def create(
         descripcion=req.descripcion,
         responsable=req.responsable,
         responsable_id=req.responsableId,
+        email=req.email,
         activo=True,
         created_at=datetime.now(timezone.utc),
         updated_at=datetime.now(timezone.utc),
@@ -143,6 +145,8 @@ async def update(
         entity.responsable = req.responsable
     if req.responsableId is not None:
         entity.responsable_id = req.responsableId
+    if req.email is not None:
+        entity.email = req.email
 
     entity.updated_at = datetime.now(timezone.utc)
     await departamento_repo.save(session, entity)

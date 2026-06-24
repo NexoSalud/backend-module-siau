@@ -56,6 +56,7 @@ class Departamento(Base):
     descripcion = Column(Text)
     responsable = Column(String(200))
     responsable_id = Column(BigInteger)
+    email = Column(String(200))  # Email for notifications
     activo = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, default=datetime.now)
     updated_at = Column(TIMESTAMP, default=datetime.now, onupdate=datetime.now)

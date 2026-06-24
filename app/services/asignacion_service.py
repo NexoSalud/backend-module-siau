@@ -7,6 +7,8 @@ from datetime import date, datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
+import logging
+
 from app.repositories import asignacion_repo, pqrsdf_repo, departamento_repo, trazabilidad_repo
 from app.schemas import (
     CreateAsignacionRequest,
@@ -14,6 +16,10 @@ from app.schemas import (
     DashboardStatsResponse,
 )
 from app.models import Asignacion, Pqrsdf, Trazabilidad
+from app.services.email_service import send_email, build_notification_body
+from app.services.catalogos import get_tipo_nombre
+
+logger = logging.getLogger(__name__)
 
 
 # ──────────────────────────────────────────────
@@ -135,6 +141,26 @@ async def create(
         created_at=datetime.now(timezone.utc),
     )
     await trazabilidad_repo.save(session, trazabilidad)
+
+    # ── Notificación por email ──────────────────────────────
+    if depto.email:
+        try:
+            tipo_nombre = get_tipo_nombre(pqrsdf.tipo) or pqrsdf.tipo
+            body = build_notification_body(
+                consecutivo=pqrsdf.consecutivo,
+                tipo_nombre=tipo_nombre,
+                descripcion=pqrsdf.descripcion,
+                ubicacion=getattr(pqrsdf, "ubicacion", "") or "",
+                fecha_limite=fecha_limite.isoformat(),
+                pqrsdf_id=pqrsdf.id,
+            )
+            subject = f"PQRSDF {pqrsdf.consecutivo} asignada a {depto.nombre}"
+            # Send async via thread executor (sync smtplib in thread)
+            import asyncio
+            loop = asyncio.get_event_loop()
+            loop.run_in_executor(None, send_email, depto.email, subject, body, None)
+        except Exception as e:
+            logger.warning("Failed to send email notification: %s", e)
 
     return _map_to_response(
         saved,

@@ -110,6 +110,7 @@ class CreateDepartamentoRequest(BaseModel):
     descripcion: str | None = None
     responsable: str | None = None
     responsableId: int | None = None
+    email: str | None = None
 
 
 class DepartamentoResponse(BaseModel):
@@ -118,6 +119,7 @@ class DepartamentoResponse(BaseModel):
     descripcion: str | None = None
     responsable: str | None = None
     responsableId: int | None = None
+    email: str | None = None
     activo: bool = True
     createdAt: datetime | None = None
     updatedAt: datetime | None = None
