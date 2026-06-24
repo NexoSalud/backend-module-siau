@@ -9,7 +9,7 @@ from app.services import departamento_service
 router = APIRouter(prefix="/api/v1/siau/departamentos", tags=["Departamentos"])
 
 
-@router.post("/", response_model=DepartamentoResponse, status_code=201)
+@router.post("", response_model=DepartamentoResponse, status_code=201)
 async def create(
     body: CreateDepartamentoRequest,
     session: AsyncSession = Depends(get_db),
@@ -18,7 +18,7 @@ async def create(
     return await departamento_service.create(session, body)
 
 
-@router.get("/", response_model=list[DepartamentoResponse])
+@router.get("", response_model=list[DepartamentoResponse])
 async def list_departamentos(
     session: AsyncSession = Depends(get_db),
 ):

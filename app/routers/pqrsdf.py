@@ -16,7 +16,7 @@ from app.services import pqrsdf_service
 router = APIRouter(prefix="/api/v1/siau/pqrsdf", tags=["PQRSDF"])
 
 
-@router.post("/", response_model=PqrsdfResponse, status_code=201)
+@router.post("", response_model=PqrsdfResponse, status_code=201)
 async def create_pqrsdf(
     body: CreatePqrsdfRequest,
     x_employee_id: int | None = Header(default=None, alias="x-employee-id"),
@@ -26,7 +26,7 @@ async def create_pqrsdf(
     return await pqrsdf_service.create(session, body, x_employee_id)
 
 
-@router.get("/", response_model=PagedResponse)
+@router.get("", response_model=PagedResponse)
 async def list_pqrsdf(
     page: int = Query(0, ge=0),
     size: int = Query(10, ge=1, le=100),

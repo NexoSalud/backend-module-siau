@@ -72,4 +72,4 @@ async def dashboard_stats(
     session: AsyncSession = Depends(get_db),
 ):
     """Get dashboard statistics."""
-    return await asignacion_service.dashboard_stats(session)
+    return await asignacion_service.get_dashboard_stats(session)

@@ -9,7 +9,7 @@ from app.services import acta_buzon_service
 router = APIRouter(prefix="/api/v1/siau/actas-buzon", tags=["Actas Buzón"])
 
 
-@router.post("/", response_model=ActaBuzonResponse, status_code=201)
+@router.post("", response_model=ActaBuzonResponse, status_code=201)
 async def create(
     body: ActaBuzonRequest,
     x_employee_id: int | None = Header(default=None, alias="x-employee-id"),
@@ -19,7 +19,7 @@ async def create(
     return await acta_buzon_service.create(session, body, x_employee_id)
 
 
-@router.get("/", response_model=list[ActaBuzonResponse])
+@router.get("", response_model=list[ActaBuzonResponse])
 async def list_actas(
     session: AsyncSession = Depends(get_db),
 ):
